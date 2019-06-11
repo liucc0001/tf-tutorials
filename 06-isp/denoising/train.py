@@ -10,6 +10,7 @@ from model import Model
 from dataset import Dataset
 from skimage.measure import compare_psnr
 from common import config
+from IPython import embed
 
 
 def get_dataset_batch(ds_name, noise_level = 50):
@@ -37,9 +38,10 @@ def main():
     args = parser.parse_args()
 
     ## load dataset
-    train_batch_gnr, train_set = get_dataset_batch(ds_name='train')
+    train_batch_gnr, train_set = get_dataset_batch(ds_name='train',
+            noise_level=25)
 
-    test_gnr, test_set = get_dataset_batch(ds_name = 'test', noise_level = 50)
+    test_gnr, test_set = get_dataset_batch(ds_name = 'test', noise_level = 25)
     ## build graph
     network = Model()
     placeholders, restored = network.build()
@@ -50,8 +52,8 @@ def main():
     loss = loss_reg + loss_squared
     ## train config
     global_steps = tf.Variable(0, trainable=False)
-    boundaries = [train_set.minibatchs_per_epoch*5, train_set.minibatchs_per_epoch*40]
-    values = [0.0001, 0.0001, 0.00005]
+    boundaries = [train_set.minibatchs_per_epoch*20, train_set.minibatchs_per_epoch*40]
+    values = [0.0001, 0.00005, 0.00001]
     lr = tf.train.piecewise_constant(global_steps, boundaries, values)
     opt = tf.train.AdamOptimizer(lr)
     # in order to update BN in every iter
@@ -121,6 +123,7 @@ def main():
                         placeholders['is_training']: False,
                     }
                     restored_v = sess.run([restored],feed_dict = feed_dict)
+                    embed()
                     psnr_x = compare_psnr(image[0,:,:,::-1], restored_v[0][0, :, :, ::-1])
                     psnrs.append(psnr_x)
                 print('average psnr is {:2.2f} dB'.format(np.mean(psnrs)))
