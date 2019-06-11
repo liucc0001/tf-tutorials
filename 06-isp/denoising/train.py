@@ -42,9 +42,11 @@ def main():
     train_batch_gnr, train_set = get_dataset_batch(ds_name='train',
             noise_level=50)
 
-    test_gnr, test_set = get_dataset_batch(ds_name = 'test', noise_level = 50)
+    test_gnr, test_set = get_dataset_batch(ds_name = 'test', noise_level = 15)
+    test_gnr1, test_set1 = get_dataset_batch(ds_name = 'test', noise_level = 25)
+    test_gnr2, test_set2 = get_dataset_batch(ds_name = 'test', noise_level = 50)
     ## build graph
-    network = Model()
+    network = Model(depth=20)
     placeholders, restored = network.build()
     gt = tf.placeholder(tf.float32, shape=(None, )+ (config.patch_size, config.patch_size)+ (config.nr_channel,), name = 'gt')
 
@@ -120,7 +122,7 @@ def main():
             if epoch % config.test_interval == 0:
                 psnrs = []
                 if epoch % 10 == 0:
-                    save_dir = os.path.join(save_img_dir, '%d'%epoch)
+                    save_dir = os.path.join(save_img_dir, '%d_1'%epoch)
                     if not os.path.isdir(save_dir):
                         os.makedirs(save_dir)
                 for i in range(test_set.testing_minibatchs_per_epoch):
@@ -139,7 +141,53 @@ def main():
                         save_img = cv2.cvtColor(save_img, cv2.COLOR_RGB2BGR)
                         save_path = os.path.join(save_dir, '%d.png'%i)
                         cv2.imwrite(save_path, save_img)
-                print('average psnr is {:2.2f} dB'.format(np.mean(psnrs)))
+                print('average psnr is {:2.2f} dB(15)'.format(np.mean(psnrs)))
+            if epoch % config.test_interval == 0:
+                psnrs = []
+                if epoch % 10 == 0:
+                    save_dir = os.path.join(save_img_dir, '%d_2'%epoch)
+                    if not os.path.isdir(save_dir):
+                        os.makedirs(save_dir)
+                for i in range(test_set1.testing_minibatchs_per_epoch):
+                    image, noisy_image = sess.run(test_gnr1)
+                    feed_dict = {
+                        placeholders['data']: noisy_image,
+                        placeholders['is_training']: False,
+                    }
+                    restored_v = sess.run([restored],feed_dict = feed_dict)
+                    psnr_x = compare_psnr(image[0,:,:,::-1], restored_v[0][0, :, :, ::-1])
+                    psnrs.append(psnr_x)
+                    if epoch % 10 == 0:
+                        save_img = restored_v[0][0, :, :, ::-1]
+                        save_img = np.clip(save_img, 0, 1) * 255
+                        save_img = save_img.astype('uint8')
+                        save_img = cv2.cvtColor(save_img, cv2.COLOR_RGB2BGR)
+                        save_path = os.path.join(save_dir, '%d.png'%i)
+                        cv2.imwrite(save_path, save_img)
+                print('average psnr is {:2.2f} dB(25)'.format(np.mean(psnrs)))
+            if epoch % config.test_interval == 0:
+                psnrs = []
+                if epoch % 10 == 0:
+                    save_dir = os.path.join(save_img_dir, '%d_3'%epoch)
+                    if not os.path.isdir(save_dir):
+                        os.makedirs(save_dir)
+                for i in range(test_set2.testing_minibatchs_per_epoch):
+                    image, noisy_image = sess.run(test_gnr2)
+                    feed_dict = {
+                        placeholders['data']: noisy_image,
+                        placeholders['is_training']: False,
+                    }
+                    restored_v = sess.run([restored],feed_dict = feed_dict)
+                    psnr_x = compare_psnr(image[0,:,:,::-1], restored_v[0][0, :, :, ::-1])
+                    psnrs.append(psnr_x)
+                    if epoch % 10 == 0:
+                        save_img = restored_v[0][0, :, :, ::-1]
+                        save_img = np.clip(save_img, 0, 1) * 255
+                        save_img = save_img.astype('uint8')
+                        save_img = cv2.cvtColor(save_img, cv2.COLOR_RGB2BGR)
+                        save_path = os.path.join(save_dir, '%d.png'%i)
+                        cv2.imwrite(save_path, save_img)
+                print('average psnr is {:2.2f} dB(50)'.format(np.mean(psnrs)))
         print('Training is done, exit.')
 
 if __name__ == "__main__":
