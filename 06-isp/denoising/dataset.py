@@ -12,13 +12,13 @@ class Dataset():
 
     def __init__(self, dataset_name, noise_level=50):
 
-        test_dataset_path = '../../dataset/CBSD68/CBSD68'
-        test_noisy_path = '../../dataset/CBSD68/CBSD68_{}'.format(noise_level)
-        train_dataset_path = '../../dataset/CBSD432/CBSD432'
+        test_dataset_path = '../../dataset/BSD68/BSD68'
+        test_noisy_path = '../../dataset/BSD68/BSD68_{}'.format(noise_level)
+        train_dataset_path = '../../dataset/Train400/Train400'
         self.minibatch_size = config.minibatch_size
         self.ds_name = dataset_name
         self.rng = np.random
-        train_list = glob.glob(train_dataset_path + '/*.jpg')
+        train_list = glob.glob(train_dataset_path + '/*.png')
         test_list = glob.glob(test_dataset_path + '/*.png')
         test_noisy_list = glob.glob(test_noisy_path + '/*.png')
         self.dataset_meta = {

@@ -5,7 +5,7 @@ import os
 
 class Config:
     '''where to write all the logging information during training(including saved models)'''
-    log_dir = './train_log_50_lr_100'
+    log_dir = './train_log_15_lr_100_gray'
 
     patch_size = 50
     stride = 10
@@ -22,7 +22,7 @@ class Config:
     show_interval = 2
     snapshot_interval = 2
     test_interval = 1
-    sigma = 50
+    sigma = 15
     use_extra_data = True
     scale = [1, 0.9, 0.8, 0.7]
     @property
