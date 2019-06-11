@@ -10,6 +10,7 @@ from model import Model
 from dataset import Dataset
 from skimage.measure import compare_psnr
 from common import config
+import cv2
 from IPython import embed
 
 
@@ -39,9 +40,9 @@ def main():
 
     ## load dataset
     train_batch_gnr, train_set = get_dataset_batch(ds_name='train',
-            noise_level=25)
+            noise_level=50)
 
-    test_gnr, test_set = get_dataset_batch(ds_name = 'test', noise_level = 25)
+    test_gnr, test_set = get_dataset_batch(ds_name = 'test', noise_level = 50)
     ## build graph
     network = Model()
     placeholders, restored = network.build()
@@ -52,7 +53,8 @@ def main():
     loss = loss_reg + loss_squared
     ## train config
     global_steps = tf.Variable(0, trainable=False)
-    boundaries = [train_set.minibatchs_per_epoch*20, train_set.minibatchs_per_epoch*40]
+    boundaries = [train_set.minibatchs_per_epoch*40,
+            train_set.minibatchs_per_epoch*80]
     values = [0.0001, 0.00005, 0.00001]
     lr = tf.train.piecewise_constant(global_steps, boundaries, values)
     opt = tf.train.AdamOptimizer(lr)
@@ -70,6 +72,7 @@ def main():
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(os.path.join(config.log_dir, 'tf_log', 'train'),
                                          tf.get_default_graph())
+    save_img_dir = os.path.join(config.log_dir, 'tf_log', 'test')
 
     ## create a session
     tf.set_random_seed(12345) # ensure consistent results
@@ -116,16 +119,26 @@ def main():
 
             if epoch % config.test_interval == 0:
                 psnrs = []
-                for _ in range(test_set.testing_minibatchs_per_epoch):
+                if epoch % 10 == 0:
+                    save_dir = os.path.join(save_img_dir, '%d'%epoch)
+                    if not os.path.isdir(save_dir):
+                        os.makedirs(save_dir)
+                for i in range(test_set.testing_minibatchs_per_epoch):
                     image, noisy_image = sess.run(test_gnr)
                     feed_dict = {
                         placeholders['data']: noisy_image,
                         placeholders['is_training']: False,
                     }
                     restored_v = sess.run([restored],feed_dict = feed_dict)
-                    embed()
                     psnr_x = compare_psnr(image[0,:,:,::-1], restored_v[0][0, :, :, ::-1])
                     psnrs.append(psnr_x)
+                    if epoch % 10 == 0:
+                        save_img = restored_v[0][0, :, :, ::-1]
+                        save_img = np.clip(save_img, 0, 1) * 255
+                        save_img = save_img.astype('uint8')
+                        save_img = cv2.cvtColor(save_img, cv2.COLOR_RGB2BGR)
+                        save_path = os.path.join(save_dir, '%d.png'%i)
+                        cv2.imwrite(save_path, save_img)
                 print('average psnr is {:2.2f} dB'.format(np.mean(psnrs)))
         print('Training is done, exit.')
 
