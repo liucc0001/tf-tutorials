@@ -4,12 +4,12 @@ import numpy as np
 import glob
 import argparse
 
-test_dataset_path = '../CBSD68/CBSD68'
+test_dataset_path = '../../dataset/BSD68/BSD68'
 test_list = glob.glob(test_dataset_path + '/*.png')
 dataset_meta = (test_list, len(test_list))
 
 def main(args):
-    target_path = os.path.join('../CBSD68','CBSD68_{}'.format(args.noise_level))
+    target_path = os.path.join('../../dataset/BSD68','BSD68_{}'.format(args.noise_level))
     if not os.path.exists(target_path):
         os.system('mkdir {}'.format(target_path))
     for i in range(len(test_list)):
