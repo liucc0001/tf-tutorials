@@ -8,6 +8,7 @@ from common import config
 import glob
 from utils import from_img_to_sub_pixel, from_sub_pixel_to_img
 from PIL import Image
+from IPython import embed
 
 mat1 = np.array([ 65.481, 128.553, 24.966 ])
 mat2 = np.array([-37.797, -74.203, 112.0  ])
@@ -24,7 +25,7 @@ class Dataset():
     def __init__(self, dataset_name):
 
         test_dataset_path = ['../../dataset/Set14/image_SRF_3']
-        train_dataset_path = '../../dataset/Train96'
+        train_dataset_path = '../../dataset/T91'
         self.minibatch_size = config.minibatch_size
         self.ds_name = dataset_name
         self.rng = np.random
@@ -32,7 +33,7 @@ class Dataset():
         self.edge = config.edge
         self.stride = config.stride
         self.patch_size = config.patch_size
-        train_list = glob.glob(train_dataset_path + '/*.jpg')
+        train_list = glob.glob(train_dataset_path + '/*.png')
         test_list = []
         for single_test_dataset_path in test_dataset_path:
             test_list = test_list + glob.glob(single_test_dataset_path + '/*LR.png')

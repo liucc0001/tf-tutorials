@@ -5,7 +5,7 @@ import os
 
 class Config:
     '''where to write all the logging information during training(including saved models)'''
-    log_dir = './train_log'
+    log_dir = './train_log_r3_sch1e-2'
 
     patch_size = 17
     stride = 9
@@ -18,7 +18,7 @@ class Config:
 
     minibatch_size = 128
     nr_channel = 1
-    nr_epoch = 200
+    nr_epoch = 120
     weight_decay = 1e-10
     show_interval = 2
     snapshot_interval = 2

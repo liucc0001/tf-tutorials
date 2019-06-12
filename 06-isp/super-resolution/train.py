@@ -12,6 +12,7 @@ from skimage.measure import compare_psnr
 from skimage import color as skco
 from common import config
 from utils import from_sub_pixel_to_img
+from IPython import embed
 
 def get_dataset_batch(ds_name):
     dataset = Dataset(ds_name)
@@ -52,8 +53,9 @@ def main():
     loss = loss_reg + loss_squared
     ## train config
     global_steps = tf.Variable(0, trainable=False)
-    boundaries = [train_set.minibatchs_per_epoch*5, train_set.minibatchs_per_epoch*40]
-    values = [0.0001, 0.0001, 0.0001]
+    boundaries = [train_set.minibatchs_per_epoch*80,
+            train_set.minibatchs_per_epoch*100]
+    values = [0.01, 0.001, 0.0001]
     lr = tf.train.piecewise_constant(global_steps, boundaries, values)
     opt = tf.train.AdamOptimizer(lr)
     # in order to update BN in every iter
@@ -70,6 +72,7 @@ def main():
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(os.path.join(config.log_dir, 'tf_log', 'train'),
                                          tf.get_default_graph())
+    save_img_dir = os.path.join(config.log_dir, 'tf_log', 'test')
 
     ## create a session
     tf.set_random_seed(12345) # ensure consistent results
@@ -117,7 +120,11 @@ def main():
 
             if epoch % config.test_interval == 0:
                 psnrs = []
-                for _ in range(test_set.testing_minibatchs_per_epoch):
+                if epoch % 10 == 0:
+                    save_dir = os.path.join(save_img_dir, '%d' % epoch)
+                    if not os.path.isdir(save_dir):
+                        os.makedirs(save_dir)
+                for i in range(test_set.testing_minibatchs_per_epoch):
                     lr_image, hr_image  = sess.run(test_gnr)
                     feed_dict = {
                         placeholders['data']: lr_image[:, :, :, :1],
@@ -129,7 +136,16 @@ def main():
                     edge = int(config.edge / 2 * config.ratio)
                     psnr_y = compare_psnr(hr_image[0, edge:-edge, edge:-edge, :1], restored_img_y)
                     psnrs.append(psnr_y)
-                    
+
+                    if epoch % 10 == 0:
+                        save_lr_img = restored_img_y
+                        save_hr_img = hr_image[0, edge:-edge, edge:-edge, :1]
+                        save_lr_img = np.clip(save_lr_img, 0, 1) * 255
+                        save_hr_img = np.clip(save_hr_img, 0, 1) * 255
+                        save_lr_path = os.path.join(save_dir, '%d_lr.png' % i)
+                        save_hr_path = os.path.join(save_dir, '%d_hr.png' % i)
+                        cv2.imwrite(save_lr_path, save_lr_img)
+                        cv2.imwrite(save_hr_path, save_hr_img)
                 print('average psnr is {:2.2f} dB'.format(np.mean(psnrs)))
         print('Training is done, exit.')
 
