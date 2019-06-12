@@ -31,7 +31,8 @@ class Dataset():
         for single_dataset_path in dataset_path:
             train_list = train_list + glob.glob(single_dataset_path +'/*_input.png')
         for single_dataset_path in test_dataset_path:
-            test_list = test_list + glob.glob(single_dataset_path + '/*_input.tif')
+            #test_list = test_list + glob.glob(single_dataset_path + '/*_input.tif')
+            test_list = test_list + glob.glob(single_dataset_path + '/*_input.png')
 
 
         self.dataset_meta = {

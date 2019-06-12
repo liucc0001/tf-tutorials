@@ -51,7 +51,8 @@ def prepare_data():
         train_list = train_list + glob.glob(single_dataset_path + '/*.png')
 
     for single_dataset_path in test_dataset_path:
-        test_list = test_list + glob.glob(single_dataset_path + '/*.tif')
+        #test_list = test_list + glob.glob(single_dataset_path + '/*.tif')
+        test_list = test_list + glob.glob(single_dataset_path + '/*.png')
     total_list = train_list + test_list
     
     for single_image in total_list:

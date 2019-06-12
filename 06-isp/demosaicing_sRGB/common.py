@@ -5,7 +5,7 @@ import os
 
 class Config:
     '''where to write all the logging information during training(including saved models)'''
-    log_dir = './train_log_lr_sch_debug'
+    log_dir = './train_log_lr_sch_aug_kodak'
 
     patch_size = 40
     stride = 10
@@ -15,7 +15,8 @@ class Config:
     exp_name = os.path.basename(log_dir)
 
     dataset_path = ['../../dataset/Flickr500']
-    test_dataset_path = ['../../dataset/mcm']
+    #test_dataset_path = ['../../dataset/mcm']
+    test_dataset_path = ['../../dataset/kodak']
     minibatch_size = 128
     nr_channel = 3
     nr_epoch = 100
