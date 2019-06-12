@@ -50,8 +50,9 @@ def main():
     loss = loss_reg + loss_squared
     ## train config
     global_steps = tf.Variable(0, trainable=False)
-    boundaries = [train_set.minibatchs_per_epoch*5, train_set.minibatchs_per_epoch*30]
-    values = [0.00001, 0.00001, 0.00001]
+    boundaries = [train_set.minibatchs_per_epoch*40,
+            train_set.minibatchs_per_epoch*80]
+    values = [0.001, 0.0005, 0.0001]
     lr = tf.train.piecewise_constant(global_steps, boundaries, values)
     opt = tf.train.AdamOptimizer(lr)
     # in order to update BN in every iter
