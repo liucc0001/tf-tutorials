@@ -5,7 +5,7 @@ import os
 
 class Config:
     '''where to write all the logging information during training(including saved models)'''
-    log_dir = './train_log_base'
+    log_dir = './train_log_sch'
 
     patch_size = 40
     stride = 20
