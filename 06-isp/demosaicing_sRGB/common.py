@@ -15,7 +15,7 @@ class Config:
     exp_name = os.path.basename(log_dir)
 
     dataset_path = ['../../dataset/Flickr500']
-    test_dataset_path = ['../../dataset/McM']
+    test_dataset_path = ['../../dataset/mcm']
     minibatch_size = 128
     nr_channel = 3
     nr_epoch = 80
