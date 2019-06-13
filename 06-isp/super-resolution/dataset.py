@@ -24,8 +24,9 @@ class Dataset():
 
     def __init__(self, dataset_name):
 
-        test_dataset_path = ['../../dataset/Set14/image_SRF_3']
-        train_dataset_path = '../../dataset/T91'
+        #test_dataset_path = ['../../dataset/Set14/image_SRF_3']
+        test_dataset_path = ['../../dataset/Set5/image_SRF_3']
+        train_dataset_path = '../../dataset/T91_G100'
         self.minibatch_size = config.minibatch_size
         self.ds_name = dataset_name
         self.rng = np.random
