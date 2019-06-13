@@ -53,7 +53,7 @@ def main():
     boundaries = [train_set.minibatchs_per_epoch*40,
             train_set.minibatchs_per_epoch*80]
     #values = [0.00001, 0.00001, 0.00001]
-    values = [0.001, 0.0005, 0.0001]
+    values = [0.0001, 0.00005, 0.00001]
     lr = tf.train.piecewise_constant(global_steps, boundaries, values)
     opt = tf.train.AdamOptimizer(lr)
     # in order to update BN in every iter
@@ -117,7 +117,7 @@ def main():
 
             if epoch % config.test_interval == 0:
                 psnrs = []
-                if epoch % 10 == 1:
+                if epoch % 10 == 0:
                     save_dir = os.path.join(save_img_dir, '%d'%epoch)
                     if not os.path.isdir(save_dir):
                         os.makedirs(save_dir)
@@ -130,7 +130,7 @@ def main():
                     restored_v = sess.run([restored],feed_dict = feed_dict)
                     psnr_x = compare_psnr(gt_image[0,:,:,::-1], restored_v[0][0, :, :, ::-1])
                     psnrs.append(psnr_x)
-                    if epoch % 10 == 1:
+                    if epoch % 10 == 0:
                         save_pred_img = restored_v[0][0, :, :, ::-1]
                         save_gt_img = gt_image[0, :, :, ::-1]
                         save_pred_img = np.clip(save_pred_img, 0, 1) * 255

@@ -7,6 +7,9 @@ import numpy as np
 from common import config
 import glob
 from scipy.ndimage import convolve
+from imgaug import augmenters as iaa
+from imgaug import parameters as iap
+import random
 
 class Dataset():
 
@@ -51,6 +54,15 @@ class Dataset():
     def testing_minibatchs_per_epoch(self):
         return self.instances
 
+    def augmentation(self, img, gt_img):
+        rotation = random.randint(0, 30) * 90
+        fliplr = random.randint(0, 1)
+        seq = iaa.Sequential([
+            iaa.Affine(rotate=rotation),
+            iaa.Fliplr(fliplr)
+            ])
+        return seq.augment_image(img), seq.augment_image(gt_img)
+
 
     def instance_generator(self):
         for i in range(self.instances):
@@ -61,6 +73,7 @@ class Dataset():
                 yield img.astype(np.float32)/255.0, gt_img.astype(np.float32)/255.0
 
             elif self.ds_name == 'train':
+                #img, gt_img = self.augmentation(img, gt_img)
                 h, w = img.shape[:2]
                 x_start = self.rng.randint(0, (w - self.patch_size)//config.stride + 1 ) * config.stride
                 y_start = self.rng.randint(0, (h - self.patch_size)//config.stride + 1 ) * config.stride
